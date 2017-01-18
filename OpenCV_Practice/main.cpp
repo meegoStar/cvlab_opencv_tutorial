@@ -4,24 +4,31 @@
 using namespace cv;
 using namespace std;
 
-int main()
-{
-	VideoCapture cap(0); // open the default camera
-	// VideoCapture cap(1); // open the second camera
+int slider_value;
+Mat src1, src2;
 
-	if (!cap.isOpened())  // check if we succeeded
-		return -1;
+void on_trackbar(int, void*){
+	double alpha = (double)slider_value / 100.0;
+	double beta = (1.0 - alpha);
+	Mat dst;
 
-	Mat edges;
-	namedWindow("my camera", 1);
-	for (;;)
-	{
-		Mat frame;
-		cap >> frame; // get a new frame from camera
-		imshow("my camera", frame);
-		if (waitKey(30) >= 0) break; // press any key to close window
-	}
+	addWeighted(src1, alpha, src2, beta, 0.0, dst);
+	imshow("trackbar demo", dst);
+}
 
-	// the camera will be deinitialized automatically in VideoCapture destructor
+int main(){
+	src1 = imread("data/lake.jpg", CV_LOAD_IMAGE_UNCHANGED);
+	src2 = imread("data/dusk.jpg", CV_LOAD_IMAGE_UNCHANGED);
+	resize(src1, src1, Size(src1.cols / 6, src1.rows / 6));
+	resize(src2, src2, Size(src2.cols / 6, src2.rows / 6));
+
+	slider_value = 0;
+	int slider_max_value = 100;
+
+	namedWindow("trackbar demo", CV_WINDOW_KEEPRATIO);
+	createTrackbar("Ratio", "trackbar demo", &slider_value, slider_max_value, on_trackbar);
+	on_trackbar(slider_value, 0);
+
+	waitKey(0);
 	return 0;
 }
