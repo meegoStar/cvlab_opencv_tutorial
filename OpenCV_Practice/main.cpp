@@ -6,21 +6,22 @@ using namespace std;
 
 int main()
 {
-	Mat frame;
-	VideoCapture cap("data/jaguar.avi");
+	VideoCapture cap(0); // open the default camera
+	// VideoCapture cap(1); // open the second camera
 
-	if (!cap.isOpened()) {
-		cout << "Cannot open the video" << endl;
+	if (!cap.isOpened())  // check if we succeeded
 		return -1;
+
+	Mat edges;
+	namedWindow("my camera", 1);
+	for (;;)
+	{
+		Mat frame;
+		cap >> frame; // get a new frame from camera
+		imshow("my camera", frame);
+		if (waitKey(30) >= 0) break; // press any key to close window
 	}
 
-	for (;;) {
-		cap.read(frame);
-
-		if (frame.rows > 0) imshow("Video Frame", frame);
-		else break;
-
-		waitKey(30);
-	}
+	// the camera will be deinitialized automatically in VideoCapture destructor
 	return 0;
 }
